@@ -1,0 +1,82 @@
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# Frontend Build Output (Vite / React)
+# ==========================================
+dist/
+client/dist/
+.vite/
+client/.vite/
+
+# ==========================================
+# Python & PyTorch Artifacts
+# ==========================================
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+eggs/
+.eggs/
+parts/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch large model weights & checkpoints (downloaded at runtime)
+*.pt
+*.pth
+*.bin
+*.onnx
+checkpoints/
+
+# ==========================================
+# Environment Variables & Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# OS & Editor Files (macOS, Windows, IDEs)
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ==========================================
+# Logs & Testing
+# ==========================================
+logs/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
