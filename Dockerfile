@@ -1,38 +1,51 @@
-# Multi-stage production build for PharmaPrint Unified Service
-FROM python:3.11-slim
+# -------------------------------------------------------------------
+# Stage 1: Build Frontend (React + Vite)
+# -------------------------------------------------------------------
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/client
+COPY client/package*.json ./
+RUN npm install
+COPY client/ ./
+RUN npm run build
+
+# -------------------------------------------------------------------
+# Stage 2: Unified Production Container (Node.js 20 + Python 3.11 AI)
+# -------------------------------------------------------------------
+FROM node:20-slim
 
 WORKDIR /app
 
-# 1. Install Node.js 20, Tesseract OCR, OpenCV runtime dependencies, and build tools
+# Install standard Python 3 and Tesseract OCR
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    build-essential \
+    python3 \
+    python3-pip \
+    python3-venv \
     tesseract-ocr \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install Python dependencies
+# Create and activate Python virtual environment
+ENV VIRTUAL_ENV=/app/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install lightweight CPU PyTorch & Torchvision
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Install Python requirements
 COPY ai-service/requirements.txt ./ai-service/
 RUN pip install --no-cache-dir -r ./ai-service/requirements.txt
 
-# 3. Build React Frontend
-COPY client/package*.json ./client/
-RUN cd client && npm install
-COPY client/ ./client/
-RUN cd client && npm run build
+# Copy built frontend assets from Stage 1
+COPY --from=frontend-builder /app/client/dist ./client/dist
 
-# 4. Install Node.js Backend dependencies
+# Install Node.js backend dependencies
 COPY server/package*.json ./server/
 RUN cd server && npm install --production
-COPY server/ ./server/
 
-# 5. Copy AI Service code
+# Copy backend & AI service code
+COPY server/ ./server/
 COPY ai-service/ ./ai-service/
 
-# 6. Environment configuration
 ENV NODE_ENV=production
 ENV PORT=5001
 EXPOSE 5001
