@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { spawn } from 'child_process';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 dotenv.config();
@@ -181,8 +182,18 @@ app.post('/api/verify', async (req, res) => {
   }
 });
 
-// Fallback 404
+// Serve static client assets in production
+const clientDistPath = path.resolve(__dirname, '../client/dist');
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+}
+
+// Fallback: serve frontend index.html for client-side routing, or 404 for APIs
 app.use('*', (req, res) => {
+  const indexPath = path.join(clientDistPath, 'index.html');
+  if (fs.existsSync(indexPath) && !req.originalUrl.startsWith('/api')) {
+    return res.sendFile(indexPath);
+  }
   res.status(404).json({ error: 'Endpoint not found' });
 });
 
