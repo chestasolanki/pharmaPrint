@@ -1,0 +1,14 @@
+{
+  "name": "pharmaprint",
+  "version": "1.0.0",
+  "description": "PharmaPrint - AI-Powered Visual Anti-Counterfeit & Package Fingerprinting System",
+  "scripts": {
+    "install:all": "cd client && npm install && cd ../server && npm install",
+    "client": "cd client && npm run dev",
+    "server": "cd server && npm run dev",
+    "dev": "node start-dev.js"
+  },
+  "keywords": ["pharmaceutical", "anti-counterfeit", "siamese-cnn", "faiss", "fingerprinting"],
+  "author": "PharmaPrint Team",
+  "license": "MIT"
+}
