@@ -28,12 +28,14 @@ ENV VIRTUAL_ENV=/app/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install lightweight CPU PyTorch & Torchvision
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# Upgrade pip and install wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Install Python requirements
+# Install Python requirements with PyTorch CPU wheel repo as extra-index-url
 COPY ai-service/requirements.txt ./ai-service/
-RUN pip install --no-cache-dir -r ./ai-service/requirements.txt
+RUN pip install --no-cache-dir \
+    --extra-index-url https://download.pytorch.org/whl/cpu \
+    -r ./ai-service/requirements.txt
 
 # Copy built frontend assets from Stage 1
 COPY --from=frontend-builder /app/client/dist ./client/dist
